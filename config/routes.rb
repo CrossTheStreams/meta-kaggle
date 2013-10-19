@@ -1,4 +1,4 @@
-RailsBoilerplate::Application.routes.draw do
+MetaKaggle::Application.routes.draw do
 
   root :to => "main#index"
 

@@ -4,4 +4,4 @@
 
 require File.expand_path('../config/application', __FILE__)
 
-RailsBoilerplate::Application.load_tasks
+MetaKaggle::Application.load_tasks

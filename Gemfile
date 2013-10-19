@@ -10,8 +10,8 @@ gem 'rails', '3.2.13'
 
 gem 'rename'
 
-
 gem 'pg'
+gem "resque", :require => 'resque/server'
 
 gem 'haml-rails'
 
