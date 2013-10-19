@@ -1,0 +1,21 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  leaderboard_id: 1
+  rank: 1
+  delta: 1
+  team_name: MyString
+  team_id: 1
+  score: 
+  entries: 1
+  last_submission: 2013-10-19 15:32:48
+
+two:
+  leaderboard_id: 1
+  rank: 1
+  delta: 1
+  team_name: MyString
+  team_id: 1
+  score: 
+  entries: 1
+  last_submission: 2013-10-19 15:32:48
