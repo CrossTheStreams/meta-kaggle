@@ -5,13 +5,12 @@ gem 'rails', '3.2.13'
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
-# NOTE: Use this gem to quickly rename the app. Scrap the gem afterwards
-# rails g rename:app_to New-Name
-
-gem 'rename'
-
 gem 'pg'
 gem "resque", :require => 'resque/server'
+gem 'resque-scheduler', :require => 'resque_scheduler'
+
+gem 'nokogiri'
+gem 'htmlentities'
 
 gem 'haml-rails'
 

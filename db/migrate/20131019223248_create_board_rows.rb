@@ -2,7 +2,7 @@ class CreateBoardRows < ActiveRecord::Migration
   def change
 
     create_table :board_rows do |t|
-      t.integer :leaderboard_id
+      t.integer :leader_board_id
       t.integer :rank
       t.integer :delta
       t.string :team_name
