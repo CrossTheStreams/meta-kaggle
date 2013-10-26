@@ -1,7 +1,7 @@
 !!!
 %html
 %head
-  %title RailsBoilerplate
+  %title MetaKaggle
   -#= stylesheet_link_tag "/bootstrap.min.css"
   = stylesheet_link_tag "application"
   = javascript_include_tag "application"
@@ -14,12 +14,11 @@
     .navbar-inner{:style => "height:40px;"}
       .container{:style => "height:40px;"}
         %a.navbar-brand{:href => "#"} 
-          Rails Boilerplate 
+          MetaKaggle
         .nav-collapse.collapse
           %ul.nav.navbar-nav
             %li 
-              %a{:href => "https://github.com/CrossTheStreams/rails_boilerplate", :target => "_blank"} 
+              %a{:href => "https://github.com/CrossTheStreams/meta-kaggle", :target => "_blank"} 
                 GitHub Repo
   .container{:style => "margin-top:50px;"}
-    %h1 Hello there!
     = yield 

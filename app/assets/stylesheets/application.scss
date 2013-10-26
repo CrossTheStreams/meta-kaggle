@@ -12,3 +12,34 @@
  *= require_tree .
  */
 
+
+body {
+  font: 12px sans-serif;
+	font-family: Arial;
+}
+
+.axis text {
+ 	fill: #000;
+}
+
+.axis path,
+.axis line {
+	shape-rendering: crispEdges;
+	fill: none;
+	stroke: #000;
+}
+.axis line{
+	stroke: #eee;
+}
+.axis path{
+	display: none;
+}
+
+.line {
+  fill: none;
+  stroke-width: 4px;
+}
+
+.name {
+  font-weight:bold;
+}
