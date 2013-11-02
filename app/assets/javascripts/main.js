@@ -54,8 +54,8 @@ function LeaderChart() {
 		.x(function(d) { return x(d.date); })
 		.y(function(d) { return y(d.score); });
 		
-	var teamscores = null;
-	var teamranks = null;
+            teamscores = null;
+	    teamranks = null;
 
 	var svg = null,
 		yAxisGroup = null,
@@ -81,8 +81,6 @@ function LeaderChart() {
 
 	this.update = function()
 	{
-		$('#pin').html('<b>Parser-Config: </b><a href="'+dataset+'_config.ini">config.ini</a>');
-		$('#pout').html(' <b>Parser-Output: </b><a href="'+dataset+'_ranks.d3.csv">ranks.d3.csv</a>, <a href="'+dataset+'_scorediffs.d3.csv">scorediffs.d3.csv</a>');
 		if(show_ranks)
 		{
 			$('#switch').html('<b>Display</b>:  Ranks |  <a href="#" onclick="leaderchart.toggle_view();"style="color:blue;text-decoration:none;">Score-Diffs</a>');
@@ -90,22 +88,24 @@ function LeaderChart() {
 			$('#switch').html('<b>Display</b>: <a href="#" onclick="leaderchart.toggle_view();" style="color:blue;text-decoration:none;">Ranks</a> |  Score-Diffs');
 		}
 			
-		input = dataset+"_";
+		input = "/"+dataset+"_";
 		input += show_ranks ? "ranks" : "scorediffs";
 		input += ".d3.csv";
 		
 		d3.csv(input, function(error, data) {
 			teamranks = data[0];
 			teamscores = data[1];
+                        console.log(teamranks)
+                        console.log(teamscores)
 			data.splice(0,2);
 			
 			color.domain(d3.keys(data[0]).filter(function(key) { return key !== "date"; }));
 
 			data.forEach(function(d) {
-				d.date = parseDate(d.date);
+			  d.date = parseDate(d.date);
 			});
 
-			var scores = color.domain().map(function(name) {
+			scores = color.domain().map(function(name) {
 				return {
 				  name: name,
 				  values: data.map(function(d) {

@@ -13,12 +13,12 @@
   .navbar.navbar-inverse.navbar-fixed-top
     .navbar-inner{:style => "height:40px;"}
       .container{:style => "height:40px;"}
-        %a.navbar-brand{:href => "#"} 
+        %a.navbar-brand{:href => root_path} 
           MetaKaggle
-        .nav-collapse.collapse
-          %ul.nav.navbar-nav
-            %li 
-              %a{:href => "https://github.com/CrossTheStreams/meta-kaggle", :target => "_blank"} 
-                GitHub Repo
+        -#.nav-collapse.collapse
+          -#%ul.nav.navbar-nav
+            -#%li 
+              -#%a{:href => "https://github.com/CrossTheStreams/meta-kaggle", :target => "_blank"} 
+                -#GitHub Repo
   .container{:style => "margin-top:50px;"}
     = yield 

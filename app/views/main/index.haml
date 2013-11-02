@@ -1,2 +1,6 @@
-.visualizations
-  #battle
+.content
+  %ul.list-unstyled
+    - Competition.all.map do |comp|
+      %li
+        %h3
+          %a{:href => competition_show_path(comp.name)} #{comp.ensure_title}

@@ -19,6 +19,10 @@ MetaKaggle::Application.configure do
   # Print deprecation notices to the Rails logger
   config.active_support.deprecation = :log
 
+  AWS_CFG = YAML.load_file("#{Rails.root.to_s}/config/aws.yml")[Rails.env] rescue {}
+
+  AWS.config(access_key_id: AWS_CFG['access_key_id'], secret_access_key: AWS_CFG['secret_access_key'], region: 'us-east-1')
+
   # Only use best-standards-support built into browsers
   config.action_dispatch.best_standards_support = :builtin
 
