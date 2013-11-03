@@ -88,15 +88,17 @@ class Scrape < ActiveRecord::Base
     end
 
     # Create LeaderBoard
+    # TODO: Only one leaderboard for any given calendar date.
     leader_board = LeaderBoard.create(:competition_id => competition.id)
 
     rows.each do |r|
-      r[:leaderboard_id] = leader_board.id
+      r[:leader_board_id] = leader_board.id
       team = Team.find_or_create_by_name_and_competition_id(r[:team_name],competition.id)
       r[:team_id] = team.id
       BoardRow.create(r)
     end
 
+    competition.async(:process_csv,:csv)
   end
   
 end

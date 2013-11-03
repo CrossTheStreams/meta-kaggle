@@ -1,13 +1,13 @@
 class Competition < ActiveRecord::Base
 
+  include Delay
+
   default_scope { order('id ASC') }
 
   attr_accessible :name
 
   has_many :leader_boards
   has_many :teams
-
-  after_create :ensure_csv_url
 
   def self.make!(name_string)
     comp = Competition.find_or_create_by_name(name_string) 

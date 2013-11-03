@@ -34,10 +34,9 @@ class ProcessCSV
 
     end
 
-    # TODO: Magically turn this data into a CSV!
     csv_string = CSV.generate do |csv|
       csv << all_team_names.unshift("date")
-      csv << (1..all_team_names.length).to_a.reverse.unshift("ranks").join(",")
+      csv << (1..all_team_names.length).to_a.reverse.unshift("ranks")
       dates.each_with_index do |date, idx|
         csv << [date].concat(team_scores.values.map {|s| s[idx]})
       end
