@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131102021330) do
+ActiveRecord::Schema.define(:version => 20131107081056) do
 
   create_table "blood", :id => false, :force => true do |t|
     t.integer "morphno"
@@ -37,7 +37,6 @@ ActiveRecord::Schema.define(:version => 20131102021330) do
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
     t.string   "title"
-    t.string   "s3_obj_key"
   end
 
   add_index "competitions", ["name"], :name => "index_competitions_on_name", :unique => true
@@ -51,6 +50,7 @@ ActiveRecord::Schema.define(:version => 20131102021330) do
     t.integer  "competition_id"
     t.datetime "created_at",     :null => false
     t.datetime "updated_at",     :null => false
+    t.integer  "scrape_id"
   end
 
   create_table "matrix1", :id => false, :force => true do |t|

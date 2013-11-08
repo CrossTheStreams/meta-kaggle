@@ -2,6 +2,8 @@ MetaKaggle::Application.routes.draw do
 
   root :to => "main#index"
 
+  match "/csv/:name" => "competition#csv", :as => 'competition_csv'
+
   match "/c/:name" => "competition#show", :as => 'competition_show'
 
   # The priority is based upon order of creation:

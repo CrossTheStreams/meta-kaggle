@@ -34,18 +34,18 @@ class ProcessCSV
 
     end
 
+    # TODO: set configurable limit on teams
+
     csv_string = CSV.generate do |csv|
+      all_team_names_length = all_team_names.length
       csv << all_team_names.unshift("date")
-      csv << (1..all_team_names.length).to_a.reverse.unshift("ranks")
       dates.each_with_index do |date, idx|
         csv << [date].concat(team_scores.values.map {|s| s[idx]})
       end
     end  
 
     # Upload to S3
-    aws_obj = competition.write_csv_to_s3(csv_string)
-
-    return aws_obj
+    competition.s3_csv = csv_string
 
   end
   

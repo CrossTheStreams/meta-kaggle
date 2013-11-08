@@ -29,17 +29,25 @@ class Competition < ActiveRecord::Base
     ProcessCSV.competition_csv!(self)
   end
 
-  def write_csv_to_s3(csv_string)
+  def s3_obj
     s3 = AWS::S3.new
     bucket = s3.buckets['meta-kaggle']
-    obj = bucket.objects[Rails.env+"/"+self.name+".csv"].write(csv_string)
-    return obj
+    obj = bucket.objects[Rails.env+"/"+self.name+".csv"] 
+  end
+
+  def s3_csv=(csv_string)
+    self.s3_obj.write(csv_string, {:acl => :public_read})
+    # TODO: When we have the obj, we need to save the obj key.
+    return
+  end
+
+  def s3_csv
+    return self.s3_obj.read rescue ''
   end
 
   def csv_url 
-    "http://meta-kaggle.s3.amazonaws.com/"+Rails.env+"/"+self.name+".csv"
+    "/csv/"+self.name+".csv"
   end
   
-
 
 end

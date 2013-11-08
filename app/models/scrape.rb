@@ -10,6 +10,8 @@ class Scrape < ActiveRecord::Base
   has_many :leader_boards
 
   def self.fetch_competitions 
+    
+    scrape = Scrape.create
 
     main = Nokogiri::HTML(open("http://www.kaggle.com/competitions"),nil,'ascii')
 
@@ -29,12 +31,13 @@ class Scrape < ActiveRecord::Base
 
     comp_strings.each do |str|
       competition = Competition.make!(str)
-      Scrape.async(:fetch_leaderboard,'fetch_lb',competition.id)
+      #Scrape.async(:fetch_leaderboard,'fetch_lb',competition.id,scrape.id)
+      Scrape.fetch_leaderboard(competition.id,scrape.id)
     end 
 
   end
 
-  def self.fetch_leaderboard(c_id)
+  def self.fetch_leaderboard(c_id,scrape_id)
 
     competition = Competition.find(c_id)
 
@@ -89,7 +92,7 @@ class Scrape < ActiveRecord::Base
 
     # Create LeaderBoard
     # TODO: Only one leaderboard for any given calendar date.
-    leader_board = LeaderBoard.create(:competition_id => competition.id)
+    leader_board = LeaderBoard.create(:competition_id => competition.id, :scrape_id => scrape_id)
 
     rows.each do |r|
       r[:leader_board_id] = leader_board.id
@@ -98,7 +101,8 @@ class Scrape < ActiveRecord::Base
       BoardRow.create(r)
     end
 
-    competition.async(:process_csv,:csv)
+    #competition.async(:process_csv,:csv)
+    competition.process_csv
   end
   
 end

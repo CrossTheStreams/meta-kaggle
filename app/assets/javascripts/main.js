@@ -88,10 +88,28 @@ function LeaderChart() {
 			$('#switch').html('<b>Display</b>: <a href="#" onclick="leaderchart.toggle_view();" style="color:blue;text-decoration:none;">Ranks</a> |  Score-Diffs');
 		}
 			
-		input = "/"+dataset+"_";
-		input += show_ranks ? "ranks" : "scorediffs";
-		input += ".d3.csv";
-		
+		//input = "/"+dataset+"_";
+		//input += show_ranks ? "ranks" : "scorediffs";
+		//input += ".d3.csv";
+                	
+                //$.get($("#csv_url").val(),function(data){
+                    //csv_arr = d3.csv.parseRows(data)
+                    //dates = []
+                    //ret = []
+                    //for(var n=0; n < csv_arr.length; n++) {
+                          //var row = csv_arr[n],
+                      //date = row.shift(1);
+                    //if(date != "date"){
+                            //dates = dates.concat(date)
+                      //}
+                        //if (n > 0) {
+                                //row = row.map(function(str){return(parseFloat(str))})
+                      //}
+                            //console.log(row)
+                      //ret.push(row)
+                    //}
+                //})
+                input = $('#csv_url').val()
 		d3.csv(input, function(error, data) {
 			teamranks = data[0];
 			teamscores = data[1];
