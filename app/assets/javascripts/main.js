@@ -4,8 +4,10 @@
 //
 
 $(document).ready(function() {
-  var leaderchart = new LeaderChart();
-  leaderchart.init("#battle"); 
+  l = new LeaderChart();
+  l.fetchCSV(function(){
+    l.init("#battle");
+  }) 
 })
 
 	
@@ -79,8 +81,84 @@ function LeaderChart() {
 			this.update();
 	};
 
-	this.update = function()
-	{
+        this.teamNames = function () {
+          var ret;
+          try {
+            ret = this.data[0];
+          }
+          catch(err) {
+            ret = "dataset is undefined"
+          }
+          return ret
+        };
+
+        this.teamRanks = function(date) {
+          var date_idx = this.dates.indexOf(date),
+              team_names = this.teamNames(),
+              scores = this.data[date_idx+1],
+              sorted_scores = scores.sort(function(a,b){b - a}),
+              ranks = {}
+
+          for (var i = 0; i < scores.length; i += 1) {
+            var score = scores[i],
+            score_idx = sorted_scores.indexOf(score),
+            rank = score_idx + 1, 
+            team_name = team_names[i] 
+            ranks[team_name] = rank
+          }
+          return(ranks);
+        };
+
+        this.rankify = function(data) {
+           var ret = [],
+               team_names = this.teamNames(),
+               dates = this.dates
+
+           for (var i = 0; i < dates.length; i += 1) {
+             var date = this.dates[i],
+             scores = this.data[i+1],
+             row = {}
+             for (var n = 0; n < scores.length ; n += 1) {
+               var team_name = team_names[n],
+                   score = scores[n]
+               row[team_name] = score;
+             } 
+             row["date"] = date;
+             ret.push(row);
+           }
+           return(ret);
+        };
+
+        this.fetchCSV = function(callback){
+          this.data = [];
+          this.dates = [];
+
+          var ret = this.data,
+              dates = this.dates;
+
+          $.get($("#csv_url").val(),function(data){
+            var csv_arr = d3.csv.parseRows(data);
+            for(var n=0; n < csv_arr.length; n++) {
+              var row = csv_arr[n],
+              date = row.shift(1);
+              if (date != "date"){
+                dates.push(date)
+              }
+              if (n > 0) {
+                row = row.map(function(str){return(parseFloat(str))})
+              }
+              console.log(row)
+              ret.push(row)
+            }
+            callback.call()
+          }) 
+
+        };
+
+	this.update = function() {
+
+          var chart = this;
+
 		if(show_ranks)
 		{
 			$('#switch').html('<b>Display</b>:  Ranks |  <a href="#" onclick="leaderchart.toggle_view();"style="color:blue;text-decoration:none;">Score-Diffs</a>');
@@ -88,34 +166,20 @@ function LeaderChart() {
 			$('#switch').html('<b>Display</b>: <a href="#" onclick="leaderchart.toggle_view();" style="color:blue;text-decoration:none;">Ranks</a> |  Score-Diffs');
 		}
 			
-		//input = "/"+dataset+"_";
-		//input += show_ranks ? "ranks" : "scorediffs";
-		//input += ".d3.csv";
-                	
-                //$.get($("#csv_url").val(),function(data){
-                    //csv_arr = d3.csv.parseRows(data)
-                    //dates = []
-                    //ret = []
-                    //for(var n=0; n < csv_arr.length; n++) {
-                          //var row = csv_arr[n],
-                      //date = row.shift(1);
-                    //if(date != "date"){
-                            //dates = dates.concat(date)
-                      //}
-                        //if (n > 0) {
-                                //row = row.map(function(str){return(parseFloat(str))})
-                      //}
-                            //console.log(row)
-                      //ret.push(row)
-                    //}
-                //})
-                input = $('#csv_url').val()
+                input = "/"+dataset+"_";
+                input += show_ranks ? "ranks" : "scorediffs";
+                input += ".d3.csv";
+
 		d3.csv(input, function(error, data) {
-			teamranks = data[0];
-			teamscores = data[1];
-                        console.log(teamranks)
-                        console.log(teamscores)
-			data.splice(0,2);
+
+                  teamranks = chart.teamRanks(chart.dates[0]);
+		  teamscores = data[1];
+                  console.log(teamranks)
+                  console.log(teamscores)
+
+                  stuffs = data;
+
+		  data.splice(0,2);
 			
 			color.domain(d3.keys(data[0]).filter(function(key) { return key !== "date"; }));
 
@@ -148,31 +212,30 @@ function LeaderChart() {
 			for(i=0;i<=subdivisions;i++) {
 				d_vals.push(new Date(d_minmax[0].getTime()+i*d_diff/subdivisions*1000*60*60*24));
 			}
+
 			xAxis.tickValues(d_vals);
-			if(show_ranks)
-			{
-				xAxis.tickSize(-height);		
+			if(show_ranks) {
+			  xAxis.tickSize(-height);		
 			} else {
-				xAxis.tickSize(-height2);	
+			  xAxis.tickSize(-height2);	
 			}
 
 			x.domain(d_minmax);
-			if(!show_ranks)
-			{
-				y.domain([0,minscoredeviation_scale]);
-				y.range([0,height2]);
-				d3.select(".viz").attr("height", height2 + margin.top + margin.bottom);
+			if(!show_ranks) {
+                          y.domain([0,minscoredeviation_scale]);
+                          y.range([0,height2]);
+                          d3.select(".viz").attr("height", height2 + margin.top + margin.bottom);
 			} else {
-				y.domain([1,max_teams]);
-				y.range([0,height]);
-				d3.select(".viz").attr("height", height + margin.top + margin.bottom);
+                          y.domain([1,max_teams]);
+                          y.range([0,height]);
+                          d3.select(".viz").attr("height", height + margin.top + margin.bottom);
 			}
 
 			// y ticks and labels
 			if (!yAxisGroup) {
-				yAxisGroup = svg.append('svg:g')
-					.attr('class', 'yTick axis')
-					.call(yAxis);
+			  yAxisGroup = svg.append('svg:g')
+			                  .attr('class', 'yTick axis')
+			                  .call(yAxis);
 			}
 			else {
 				svg.select('.yTick').call(yAxis);
@@ -207,8 +270,9 @@ function LeaderChart() {
 			}
 
 			svg.selectAll(".teams").remove(); 
-			 var teams = svg.selectAll(".teams").data(scores).enter().append("g")
-				  .attr("class", "teams");
+
+                        var teams = svg.selectAll(".teams").data(scores).enter().append("g")
+                                       .attr("class", "teams");
 
 			teams.append("path")
 				  .attr("class", "line")
@@ -216,61 +280,67 @@ function LeaderChart() {
 				  .style("stroke", function(d) { return color(d.name); })
 				  .append("title").text(function(d) { return d.name; });
 
-			  teams.append("circle")
-				 .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
-				  .attr("cx", function(d) { return x(d.value.date); })
-				  .attr("cy", function(d) { return y(d.value.score); })
-				  .attr("r", 6)
-				  .style("fill", function(d) { return color(d.name); })
-				  .append("title").text(function(d) { return d.name; });
+                        teams.append("circle")
+                               .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
+                                .attr("cx", function(d) { return x(d.value.date); })
+                                .attr("cy", function(d) { return y(d.value.score); })
+                                .attr("r", 6)
+                                .style("fill", function(d) { return color(d.name); })
+                                .append("title").text(function(d) { return d.name; });
 					
 			svg.selectAll(".legend").remove(); 
-			 var legend = svg.selectAll(".legend")
-				  .data(color.domain())
+
+			var legend = svg.selectAll(".legend")
+				.data(color.domain())
 				.enter().append("g")
-				  .attr("class", "legend")
-				  .attr("transform", function(d, i) { return "translate(0," + eval(( scores.length - i-1)*(line_height*max_teams/(max_teams-1)))+ ")"; });
+				.attr("class", "legend")
+				.attr("transform", function(d, i) { return "translate(0," + eval(( scores.length - i-1)*(line_height*max_teams/(max_teams-1)))+ ")"; });
 
-				if(!show_ranks)
-				{
-					legend.append("text")
-					  .attr("x", width + 60)
-					  .attr("y", -3)
-					  .attr("dy", "0.6em")
-					  .style("text-anchor", "end")
-					  .attr("class", function(d,i) { return i==scores.length-1?"name":""; })
-					  .text(function(d,i) { return teamranks[d]+"."; });
-				} else {
-					legend.append("text")
-					  .attr("x", width + 60)
-					  .attr("y", -3)
-					  .attr("dy", "0.6em")
-					  .style("text-anchor", "end")
-					  .attr("class", function(d,i) { return i==scores.length-1?"name":""; })
-					  .text(function(d) { return teamranks[d]+"."; });
-				}
-				
-				legend.append("text")
-				  .attr("x", width + 140)
-				  .attr("y", -3)
-				  .attr("dy", "0.6em")
-				  .style("text-anchor", "end")
-				  .attr("class", function(d,i) { return i==scores.length-1?"name":""; })
-				  .text(function(d) { return teamscores[d]; });
+                        if (!show_ranks) {
+                          legend.append("text")
+                            .attr("x", width + 60)
+                            .attr("y", -3)
+                            .attr("dy", "0.6em")
+                            .style("text-anchor", "end")
+                            .attr("class", function(d,i) { return i==scores.length-1?"name":""; })
+                            .text(function(d,i) { 
+                              console.log(d);
+                              return teamranks[d]+"."; 
+                            });
+                        } else {
+                          legend.append("text")
+                            .attr("x", width + 60)
+                            .attr("y", -3)
+                            .attr("dy", "0.6em")
+                            .style("text-anchor", "end")
+                            .attr("class", function(d,i) { return i==scores.length-1?"name":""; })
+                            .text(function(d) { 
+                              console.log(d);
+                              return teamranks[d]+"."; 
+                            });
+                        }
+                        
+                        legend.append("text")
+                          .attr("x", width + 140)
+                          .attr("y", -3)
+                          .attr("dy", "0.6em")
+                          .style("text-anchor", "end")
+                          .attr("class", function(d,i) { return i==scores.length-1?"name":""; })
+                          .text(function(d) { return teamscores[d]; });
 				  
-			  legend.append("circle")
-				  .attr("cx", width + 170)
-				  .attr("cy",0)
-				  .attr("r", 6)
-				  .style("fill", color);
+                        legend.append("circle")
+                                .attr("cx", width + 170)
+                                .attr("cy",0)
+                                .attr("r", 6)
+                                .style("fill", color);
 
-			  legend.append("text")
-				  .attr("x", width + 180)
-				  .attr("y", -3)
-				  .attr("dy", "0.6em")
-				  .style("text-anchor", "start")
-				  .attr("class", function(d,i) { return i==scores.length-1?"name":""; })
-				  .text(function(d) { return d; });
+                        legend.append("text")
+                                .attr("x", width + 180)
+                                .attr("y", -3)
+                                .attr("dy", "0.6em")
+                                .style("text-anchor", "start")
+                                .attr("class", function(d,i) { return i==scores.length-1?"name":""; })
+                                .text(function(d) { return d; });
 
 		});
 		
