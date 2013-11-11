@@ -22,7 +22,7 @@ class ProcessCSV
       LeaderBoard.pluck_all(lb.board_rows,:team_name,:score).map(&:values).map {|a| lb_scores[a[0]] = a[1]}
 
       if i == 0
-        all_team_names = lb_scores.keys
+        all_team_names = lb_scores.keys.sort
       end
 
       all_team_names.each do |tn|

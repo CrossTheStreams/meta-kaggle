@@ -76,7 +76,8 @@ class Scrape < ActiveRecord::Base
 
         row_hash[:delta] = delta_str.scan(/[-+0123456789]+/).first
         # name
-        row_hash[:team_name] = col_arr[2].text.scan(/[(\w|\s)]*/).first.strip[0..99] rescue ''
+        row_hash[:team_name] = col_arr[2].css("a.team-link").text.scan(/[(\w|\s)]*/).first.strip[0..99] rescue ''
+
         # score
         row_hash[:score] = col_arr[3].text.strip.to_f
         # entries
