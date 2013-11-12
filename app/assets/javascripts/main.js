@@ -34,7 +34,7 @@ function LeaderChart() {
 
 	var y = d3.scale.linear();
 
-	var color = d3.scale.ordinal()
+            color = d3.scale.ordinal()
 		.range(["#80b325","#00914a","#019b9c","#0081df","#7b3cd5","#e00b90","#e53517","#eb6a0a","#f49e00","#ffd500"
 		]);
 
@@ -78,15 +78,30 @@ function LeaderChart() {
 	  this.update();
 	};
 
-        this.teamNames = function () {
+        // data : String : a string representing a date in the dataset
+        this.teamNames = function (date) {
           var ret;
-          try {
-            ret = this.data[0];
+          if (typeof(date) == 'undefined') {
+            try {
+              ret = this.data[0];
+            }
+            catch(err) {
+              ret = "dataset is undefined"
+            }
+            return ret 
+          } else {
+            var date_idx = this.dates.indexOf(date),
+            ts_pairs = this.teamScorePairs(date),
+            ts_arr = []
+            delete ts_pairs["date"]
+            for (var team in ts_pairs) {
+              ts_arr.push([team, ts_pairs[team]]);
+            }
+            ts_arr.sort(function(a,b){ return a[1] - b[1] });
+            ret = ts_arr.map(function(a){ return(a[0]) });
+            return(ret)
           }
-          catch(err) {
-            ret = "dataset is undefined"
-          }
-          return ret
+
         };
 
 
@@ -94,32 +109,36 @@ function LeaderChart() {
           var date_idx = this.dates.indexOf(date),
               team_names = this.teamNames(),
               scores = this.data[date_idx+1],
-              ts_pairs = {}
+              ts_pairs = {};
 
           for (var i = 0; i < scores.length; i += 1) {
             var score = scores[i],
             team_name = team_names[i] 
 
-            ts_pairs[team_name] = score
+            ts_pairs[team_name] = score;
           }
+          ts_pairs["date"] = date;
           return(ts_pairs);  
         };
 
         this.rankify = function(data) {
            var ret = [],
                team_names = this.teamNames(),
-               dates = this.dates, 
+               dates = this.dates,
                score_cache = {} 
 
            // dates, our observations
-           for (var idx = (dates.length - 1); idx >= 0; idx -= 1) {
+           for (var idx = 0; idx < dates.length; idx += 1) {
 
              var date = dates[idx],
              scores = data[idx + 1],
              unique_scores = scores.getUnique().sort(function(a, b) {return a - b; }),
              row = {},
-             //rank = 1
-             rank = scores.filter(function(n){ return n != -1}).length
+             rank = 1,
+             // teams we've already ranked for a date
+             ranked_teams = []
+             //rank = scores.filter(function(n){ return n != -1}).length,
+
 
              // iterate scores in order to reference team name by score
              for (var n = 0; n < scores.length ; n += 1) {
@@ -138,28 +157,39 @@ function LeaderChart() {
 
              } 
 
-             console.log(unique_scores)
+
+             console.log(date)
+             if (idx) {
+               stuff = unique_scores    
+             }
+
+             //console.log(unique_scores)
              // iterate unique scores
              // use cache to order teams with same scores and get a rank
-             for (var i = 0; i < unique_scores.length; i += 1) {
+             for (var i = (unique_scores.length - 1); i >= 0; i -= 1) {
                var us = unique_scores[i],
                    us_str = us.toString(),
                    cache_names = score_cache[us_str]
+                   rank_diff = 0
 
+               //console.log(cache_names)
                // team names should already be sub-ordered in alphabetical order
                // if two teams get a score in the same day, for now we can't know who got there first
                for (var n = 0; n < cache_names.length; n += 1) {
-                 team_name = cache_names[n]
+                 var team_name = cache_names[n]
 
                  // team doesn't have a score yet.
                  if (us == -1 ) { 
                    row[team_name] = -1; 
                  } else {
-
-                   console.log(rank)
-                   console.log(us_str)
-                   row[team_name] = rank; 
-                   rank -= 1
+                   //console.log(team_name)
+                   //console.log(rank)
+                   //console.log(us_str)
+                   if (ranked_teams.indexOf(team_name) == -1) {
+                     row[team_name] = rank; 
+                     ranked_teams.push(team_name) 
+                     rank += 1
+                   }
                  }   
                }   
              }   
@@ -213,31 +243,38 @@ function LeaderChart() {
 
 		//d3.csv(input, function(error, data) {
 
-                  data = chart.ranked_data
-                  teamranks = chart.ranked_data[1]
-		  teamscores = chart.teamScorePairs(chart.dates[1]);
+                  data = chart.ranked_data;
+                  teamranks = chart.ranked_data[3];
+		  teamscores = chart.teamScorePairs(chart.dates[3]);
 
                   //console.log(teamranks)
                   //console.log(teamscores)
-                  color.domain(d3.keys(data[0]).filter(function(key) { return key !== "date"; }));
+                  color.domain(l.teamNames(l.dates[3]));
 
                   data.forEach(function(d) {
                     d.date = parseDate(d.date);
                   });
 
                   scores = color.domain().map(function(name) {
+                    console.log(name);
                     return {
                       name: name,
                       values: data.map(function(d) {
-                        return {date: d.date, score: + d[name]};
+                        console.log(d[name]);
+                        var ret = {date: d.date, score: + d[name]};
+                        //console.log(ret)
+                        return(ret)
                       })
                     };
                   });
+
                   
+
                   d_minmax = d3.extent(data, function(d) { return d.date; });
                   d_diff = (d_minmax[1].getTime()-d_minmax[0].getTime())/1000/60/60/24;
                   d_vals = new Array();
                   subdivisions = 1;
+
                   if (d_diff==0) {
                     d_minmax[0] = new Date(d_minmax[0].getTime()-1000*60*60*24);
                     d_diff = 1;
@@ -250,6 +287,7 @@ function LeaderChart() {
                     d_vals.push(new Date(d_minmax[0].getTime()+i*d_diff/subdivisions*1000*60*60*24));
                   }
 
+                  // x axis
                   xAxis.tickValues(d_vals);
                   if (show_ranks) {
                     xAxis.tickSize(-height);		
@@ -308,7 +346,10 @@ function LeaderChart() {
 
                   svg.selectAll(".teams").remove(); 
 
-                  var teams = svg.selectAll(".teams").data(scores).enter().append("g")
+                  var teams = svg.selectAll(".teams")
+                                 .data(scores)
+                                 .enter()
+                                 .append("g")
                                  .attr("class", "teams");
 
                   teams.append("path")
@@ -327,11 +368,14 @@ function LeaderChart() {
 					
                   svg.selectAll(".legend").remove(); 
 
-                  var legend = svg.selectAll(".legend")
+                     legend = svg.selectAll(".legend")
                           .data(color.domain())
-                          .enter().append("g")
+                          .enter()
+                          .append("g")
                           .attr("class", "legend")
-                          .attr("transform", function(d, i) { return "translate(0," + eval(( scores.length - i-1)*(line_height*max_teams/(max_teams-1)))+ ")"; });
+                          .attr("transform", function(d, i) { 
+                            return "translate(0," + eval(( scores.length - i-1)*(line_height*max_teams/(max_teams-1)))+ ")"; 
+                          });
 
                   if (!show_ranks) {
                     legend.append("text")
@@ -353,7 +397,7 @@ function LeaderChart() {
                           .style("text-anchor", "end")
                           .attr("class", function(d,i) { return i==scores.length-1?"name":""; })
                           .text(function(d) { 
-                            console.log(d);
+                            //console.log(d);
                             return teamranks[d]+"."; 
                           });
                   }

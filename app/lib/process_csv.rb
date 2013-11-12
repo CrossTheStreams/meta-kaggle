@@ -16,7 +16,7 @@ class ProcessCSV
 
       # array of hashes {"score" => "0.90" (string), "team_name => "Team Awesome"}
       date = lb.created_at.strftime('%Y%m%d')
-      dates << date
+      dates.unshift(date)
       lb_scores = {}
       
       LeaderBoard.pluck_all(lb.board_rows,:team_name,:score).map(&:values).map {|a| lb_scores[a[0]] = a[1]}
@@ -40,7 +40,7 @@ class ProcessCSV
       all_team_names_length = all_team_names.length
       csv << all_team_names.unshift("date")
       dates.each_with_index do |date, idx|
-        csv << [date].concat(team_scores.values.map {|s| s[idx]})
+        csv << [date].concat(team_scores.values.map {|s| s[(s.length - 1)- idx]})
       end
     end  
 
