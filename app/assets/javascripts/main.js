@@ -17,7 +17,7 @@ $(document).ready(function() {
 function LeaderChart() {
 	
 	var show_ranks = true;
-	var max_teams = 10;
+	var max_teams = 50;
 	var line_height = 20;
 	var minscoredeviation_scale = 0.0018;
 	var dataset = "GiveMeSomeCredit_public_leaderboard";
@@ -90,20 +90,36 @@ function LeaderChart() {
             }
             return ret 
           } else {
+            console.log(l.ranked_data[3])
             var date_idx = this.dates.indexOf(date),
-            ts_pairs = this.teamScorePairs(date),
+            ts_pairs = l.teamRankPairs(date),
+            //ts_pairs = this.teamScorePairs(date),
             ts_arr = []
-            delete ts_pairs["date"]
+
             for (var team in ts_pairs) {
               ts_arr.push([team, ts_pairs[team]]);
             }
-            ts_arr.sort(function(a,b){ return a[1] - b[1] });
+            ts_arr.sort(function(a,b){ return b[1] - a[1] });
             ret = ts_arr.map(function(a){ return(a[0]) });
             return(ret)
           }
 
         };
+        
 
+        this.teamRankPairs = function(date) {
+          var date_idx = this.dates.indexOf(date),
+              tr_pairs = l.ranked_data[date_idx],
+              ret_obj = {}
+
+          for (team in tr_pairs) {
+            if (team != 'date') {
+              ret_obj[team] = tr_pairs[team];
+            }
+          }
+
+          return(ret_obj)
+        }
 
         this.teamScorePairs = function(date) {
           var date_idx = this.dates.indexOf(date),
@@ -156,12 +172,6 @@ function LeaderChart() {
                }
 
              } 
-
-
-             console.log(date)
-             if (idx) {
-               stuff = unique_scores    
-             }
 
              //console.log(unique_scores)
              // iterate unique scores
@@ -229,8 +239,6 @@ function LeaderChart() {
 
 	this.update = function() {
 
-          var chart = this;
-
           if (show_ranks) {
             $('#switch').html('<b>Display</b>:  Ranks |  <a href="#" onclick="leaderchart.toggle_view();"style="color:blue;text-decoration:none;">Score-Diffs</a>');
           } else {
@@ -242,25 +250,27 @@ function LeaderChart() {
           //input += ".d3.csv";
 
 		//d3.csv(input, function(error, data) {
+                  var date_idx = (this.dates.length - 1)
 
-                  data = chart.ranked_data;
-                  teamranks = chart.ranked_data[3];
-		  teamscores = chart.teamScorePairs(chart.dates[3]);
+                  data = this.ranked_data;
+                  teamranks = this.ranked_data[date_idx];
+		  teamscores = this.teamScorePairs(this.dates[date_idx]);
 
                   //console.log(teamranks)
                   //console.log(teamscores)
-                  color.domain(l.teamNames(l.dates[3]));
+                  color.domain(l.teamNames(l.dates[date_idx]));
 
                   data.forEach(function(d) {
+                    console.log(d);
                     d.date = parseDate(d.date);
                   });
 
                   scores = color.domain().map(function(name) {
-                    console.log(name);
+                    //console.log(name);
                     return {
                       name: name,
                       values: data.map(function(d) {
-                        console.log(d[name]);
+                        //console.log(d[name]);
                         var ret = {date: d.date, score: + d[name]};
                         //console.log(ret)
                         return(ret)
@@ -286,6 +296,8 @@ function LeaderChart() {
                   for (i=0;i<=subdivisions;i++) {
                     d_vals.push(new Date(d_minmax[0].getTime()+i*d_diff/subdivisions*1000*60*60*24));
                   }
+
+                  console.log(d_vals)
 
                   // x axis
                   xAxis.tickValues(d_vals);
