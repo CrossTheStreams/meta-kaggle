@@ -1,4 +1,8 @@
 development:
+  max_teams: 50
 test:
 staging:
+  max_teams: 50
 production:
+  max_teams: 50
+

@@ -32,7 +32,15 @@ class Scrape < ActiveRecord::Base
     comp_strings.each do |str|
       competition = Competition.make!(str)
       #Scrape.async(:fetch_leaderboard,'fetch_lb',competition.id,scrape.id)
-      Scrape.fetch_leaderboard(competition.id,scrape.id)
+      
+      end_date = competition.end_date
+      
+      is_active = (Date.today < competition.end_date.to_date) rescue false
+
+      if competition.end_date.blank? || is_active
+        Scrape.fetch_leaderboard(competition.id,scrape.id)
+      end
+
     end 
 
   end
@@ -42,6 +50,8 @@ class Scrape < ActiveRecord::Base
     competition = Competition.find(c_id)
 
     doc = Nokogiri::HTML(open('http://www.kaggle.com/c/'+competition.name+'/leaderboard'))
+
+    competition.update_attribute(:end_date, DateTime.parse(doc.css("#comp-header-stats-end").first.text)) rescue nil
 
     board_rows = doc.css('#leaderboard-table tr')
 
