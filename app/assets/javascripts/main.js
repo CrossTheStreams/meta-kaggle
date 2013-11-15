@@ -6,10 +6,16 @@
 var error_based;
 
 $(document).ready(function() {
-  l = new LeaderChart();
-  l.fetchCSV(function(){
-    l.init("#battle");
-  }) 
+  $('.navbar-brand span').lettering();
+  if ($("#csv_url").length == 1) {
+    l = new LeaderChart();
+    l.fetchCSV(function(){
+      l.init("#battle");
+    }) 
+  }
+  else {
+    // homepage
+  }
 })
 
 	
