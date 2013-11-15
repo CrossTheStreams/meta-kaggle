@@ -12,10 +12,10 @@
  *= require_tree .
  */
 
-
 body {
+  background-color: #333 !important;
   font: 12px sans-serif;
-	font-family: Arial;
+  font-family: Arial;
 }
 
 .axis text {
@@ -51,3 +51,67 @@ svg {
   margin: auto;
   display: block;
 }
+
+
+.navbar-brand {
+
+  .char1 { 
+    color:#80b325;
+  }
+  .char2 { 
+    color:#00914a;
+  }
+  .char3 { 
+    color:#019b9c;
+  }
+  .char4 { 
+    color:#0081df;
+  }
+  .char5 { 
+    color:#7b3cd5;
+  }
+  .char6 { 
+    color:#e00b90;
+  }
+  .char7 { 
+    color:#e53517;
+  }
+  .char8 { 
+    color:#eb6a0a;
+  }
+  .char9 { 
+    color:#f49e00;
+  }
+  .char10 { 
+    color:#ffd500;
+  }
+  .char11 { 
+    color:#80b325;
+  }
+  .char12 { 
+    color:#00914a;
+  }
+  .char13 { 
+    color:#019b9c;
+  }
+  .char14 { 
+    color:#0081df;
+  }
+  .char15 { 
+    color:#7b3cd5;
+  }
+  .char16 { 
+    color:#e00b90;
+  }
+  .char17 { 
+    color:#e53517;
+  }
+}
+
+.navbar-brand {
+  left: 0px;
+  position: absolute;
+  min-width: 250px;
+}
+
+
