@@ -3,6 +3,8 @@
 // You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 //
 
+var error_based;
+
 $(document).ready(function() {
   l = new LeaderChart();
   l.fetchCSV(function(){
@@ -99,8 +101,11 @@ function LeaderChart() {
       for (var team in ts_pairs) {
         ts_arr.push([team, ts_pairs[team]]);
       }
+      // this competition scores low to high, based on error
       ts_arr.sort(function(a,b){ return b[1] - a[1] });
+      
       ret = ts_arr.map(function(a){ return(a[0]) });
+
       return(ret)
     }
 
@@ -153,8 +158,10 @@ function LeaderChart() {
        rank = 1,
        // teams we've already ranked for a date
        ranked_teams = []
-       //rank = scores.filter(function(n){ return n != -1}).length,
 
+       if (error_based) {
+         rank = scores.filter(function(n){ return n != -1}).length
+       }
 
        // iterate scores in order to reference team name by score
        for (var n = 0; n < scores.length ; n += 1) {
@@ -198,7 +205,13 @@ function LeaderChart() {
              if (ranked_teams.indexOf(team_name) == -1) {
                row[team_name] = rank; 
                ranked_teams.push(team_name) 
-               rank += 1
+               if (error_based) {
+                 rank -= 1 
+                 console.log(rank)
+               }
+               else {
+                 rank += 1 
+               }
              }
            }   
          }   
@@ -289,8 +302,6 @@ function LeaderChart() {
     for (i=0;i<=subdivisions;i++) {
       d_vals.push(new Date(d_minmax[0].getTime()+i*d_diff/subdivisions*1000*60*60*24));
     }
-
-    console.log(d_vals)
 
     // x axis
     xAxis.tickValues(d_vals);
@@ -428,6 +439,8 @@ function LeaderChart() {
             .style("text-anchor", "start")
             .attr("class", function(d,i) { return i==scores.length-1?"name":""; })
             .text(function(d) { return d; });
+    
+    $("#battle").fadeIn();
           
   };
   

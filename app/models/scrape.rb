@@ -30,6 +30,7 @@ class Scrape < ActiveRecord::Base
     end
 
     comp_strings.each do |str|
+
       competition = Competition.make!(str)
       #Scrape.async(:fetch_leaderboard,'fetch_lb',competition.id,scrape.id)
       
@@ -57,7 +58,7 @@ class Scrape < ActiveRecord::Base
 
     rows = []
 
-    board_rows.map do |ele|
+    board_rows.each_with_index do |ele, idx|
 
       id = ele.attr('id')
       scan = id.scan(/team-/) rescue []
@@ -90,6 +91,7 @@ class Scrape < ActiveRecord::Base
 
         # score
         row_hash[:score] = col_arr[3].text.strip.to_f
+
         # entries
         row_hash[:entries] = col_arr[4].text.strip.to_i
         # last submission
@@ -111,6 +113,14 @@ class Scrape < ActiveRecord::Base
       r[:team_id] = team.id
       BoardRow.create(r)
     end
+
+    first_score = leader_board.board_rows.order('id ASC').limit(1).pluck(:score).first
+    last_score = leader_board.board_rows.order('id DESC').limit(1).pluck(:score).first
+
+    # This contest scores accuracy by error.
+    if last_score > first_score
+      competition.update_attribute(:error_based, true) 
+    end 
 
     #competition.async(:process_csv,:csv)
     competition.process_csv
