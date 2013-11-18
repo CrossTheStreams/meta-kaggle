@@ -275,7 +275,8 @@ function LeaderChart() {
 
   this.update = function() {
 
-    var max_teams = this.max_teams,
+    //var max_teams = this.max_teams,
+    var max_teams = this.data[0].length,
         line_height = this.line_height,
         show_ranks = this.show_ranks,
         minscoredeviation_scale = this.minscoredeviation_scale;
