@@ -25,7 +25,7 @@ $(document).ready(function() {
 function LeaderChart() { 
 	
   this.show_ranks = true;
-  this.max_teams = 50;
+  this.max_teams = 100;
   this.line_height = 20;
   this.minscoredeviation_scale = 0.0018;
 

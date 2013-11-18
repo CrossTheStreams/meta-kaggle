@@ -6,6 +6,6 @@
           %a{:class => 'char'+idx.to_s, :href => competition_show_path(comp.name)} #{comp.ensure_title}
   %br
   - if params[:action] == 'inactive'
-    %a{:href => '/inactive'} Active Competitions
+    %a{:href => '/'} Active Competitions
   - else 
-    %a{:href => '/'} Inactive Competitions
+    %a{:href => '/inactive'} Inactive Competitions
