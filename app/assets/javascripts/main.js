@@ -3,36 +3,35 @@
 // You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 //
 
-var error_based;
+var error_based,
+    gui;
 
 $(document).ready(function() {
   $('.navbar-brand span').lettering();
   if ($("#csv_url").length == 1) {
     l = new LeaderChart();
-    l.fetchCSV(function(){
-      l.init("#battle");
-    }) 
+    l.init("#battle");
   }
   else {
     // homepage
   }
 })
 
+
 	
 // Credit to Oliver Staubli, winnder of the Leapfrogging Leaderboard contest, for comming up with the original visualization!
 // http://www.kaggle.com/c/leapfrogging-leaderboards/visualization/710
 // 
-function LeaderChart() {
+function LeaderChart() { 
 	
-  var show_ranks = true;
-  var max_teams = 50;
-  var line_height = 20;
-  var minscoredeviation_scale = 0.0018;
-  var dataset = "GiveMeSomeCredit_public_leaderboard";
+  this.show_ranks = true;
+  this.max_teams = 50;
+  this.line_height = 20;
+  this.minscoredeviation_scale = 0.0018;
 
   var margin = {top: 40, right: 300, bottom: 10, left: 20},
           width = 960 - margin.left - margin.right,
-          height = max_teams*line_height,
+          height = (this.max_teams)*this.line_height,
           height2 = 300;
   
   var parseDate = d3.time.format("%Y%m%d").parse;
@@ -48,8 +47,8 @@ function LeaderChart() {
 
   var xAxis = d3.svg.axis()
           .scale(x)
-          .tickPadding(line_height)
-          .tickFormat(d3.time.format("%d.%m"))
+          .tickPadding(this.line_height)
+          .tickFormat(d3.time.format("%m.%d"))
           .orient("top");
 
   var yAxis = d3.svg.axis()
@@ -71,19 +70,46 @@ function LeaderChart() {
           yAxisGroup = null,
           xAxisGroup = null;
   
+  this.ui_callbacks = function() {
+
+    // 1. High path on hover and make others opaque
+    //$('path').on('mouseover',function() { 
+      //$('path').not(this).addClass('opaque');
+    //});
+
+    //$('path').on('mouseout',function() {
+      //$('path').not(this).removeClass('opaque');
+    //});
+    //
+    // 2. Circles move on date hover; scores/rank in legen should reorder
+
+  },
+  this.ensure_gui = function() {
+    if (!$("#gui").is(":visible")) {
+      gui = new dat.GUI({ autoPlace: false });
+      var navbar = $('#battle .navbar #gui');
+      navbar.append(gui.domElement);
+      gui.add(l, 'max_teams',0,l.data[0].length).name('# of Teams')
+      gui.add(l, 'toggle_view', ['Ranks', 'Scores']).name('Y-Axis:') 
+    } 
+  },
   this.init = function(element) {	
-    l.ranked_data = l.rankify(l.data)
-    svg = d3.select(element).select('svg').select('g');
-    if (svg.empty()) {
-      svg = d3.select(element)
-              .append("svg")
-              .attr("width", width + margin.left + margin.right)
-              .attr("height", height + margin.top + margin.bottom)
-              .attr('class', 'viz')
-              .append("g")
-              .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    }	
-    this.update();
+    var leaderboard = this;
+    leaderboard.fetchCSV(function(){
+      leaderboard.ranked_data = leaderboard.rankify(leaderboard.data)
+      svg = d3.select(element).select('svg').select('g');
+      if (svg.empty()) {
+        svg = d3.select(element)
+                .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .attr('class', 'viz')
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+      }	
+      leaderboard.ensure_gui();
+      leaderboard.update();
+    }) 
   };
 
   // data : String : a string representing a date in the dataset
@@ -98,7 +124,6 @@ function LeaderChart() {
       }
       return ret 
     } else {
-      console.log(l.ranked_data[3])
       var date_idx = this.dates.indexOf(date),
       ts_pairs = l.teamRankPairs(date),
       //ts_pairs = this.teamScorePairs(date),
@@ -186,7 +211,6 @@ function LeaderChart() {
 
        } 
 
-       //console.log(unique_scores)
        // iterate unique scores
        // use cache to order teams with same scores and get a rank
        for (var i = (unique_scores.length - 1); i >= 0; i -= 1) {
@@ -195,7 +219,6 @@ function LeaderChart() {
              cache_names = score_cache[us_str]
              rank_diff = 0
 
-         //console.log(cache_names)
          // team names should already be sub-ordered in alphabetical order
          // if two teams get a score in the same day, for now we can't know who got there first
          for (var n = 0; n < cache_names.length; n += 1) {
@@ -205,15 +228,11 @@ function LeaderChart() {
            if (us == -1 ) { 
              row[team_name] = -1; 
            } else {
-             //console.log(team_name)
-             //console.log(rank)
-             //console.log(us_str)
              if (ranked_teams.indexOf(team_name) == -1) {
                row[team_name] = rank; 
                ranked_teams.push(team_name) 
                if (error_based) {
                  rank -= 1 
-                 console.log(rank)
                }
                else {
                  rank += 1 
@@ -248,7 +267,6 @@ function LeaderChart() {
         if (n > 0) {
           row = row.map(function(str){return(parseFloat(str))})
         }
-        //console.log(row)
         ret.push(row)
       }
       callback.call()
@@ -257,36 +275,38 @@ function LeaderChart() {
 
   this.update = function() {
 
+    var max_teams = this.max_teams,
+        line_height = this.line_height,
+        show_ranks = this.show_ranks,
+        minscoredeviation_scale = this.minscoredeviation_scale;
+
+
     if (show_ranks) {
-      $('#switch').html('<b>Display</b>:  Ranks |  <a href="#" onclick="leaderchart.toggle_view();"style="color:blue;text-decoration:none;">Score-Diffs</a>');
+      $('#switch').html('<b>Display</b>:  Ranks |  <a href="#" onclick="l.toggle_view();"style="color:blue;text-decoration:none;">Score-Diffs</a>');
     } else {
-      $('#switch').html('<b>Display</b>: <a href="#" onclick="leaderchart.toggle_view();" style="color:blue;text-decoration:none;">Ranks</a> |  Score-Diffs');
+      $('#switch').html('<b>Display</b>: <a href="#" onclick="l.toggle_view();" style="color:blue;text-decoration:none;">Ranks</a> |  Score-Diffs');
     }
                   
-    //d3.csv(input, function(error, data) {
-    var date_idx = (this.dates.length - 1)
-
+    var date_idx = (this.dates.length - 1),
     data = this.ranked_data;
-    teamranks = this.ranked_data[date_idx];
-    teamscores = this.teamScorePairs(this.dates[date_idx]);
 
-    //console.log(teamranks)
-    //console.log(teamscores)
+    teamranks = this.ranked_data[date_idx]; 
+    teamscores = this.teamScorePairs(this.dates[date_idx]); 
+
     color.domain(l.teamNames(l.dates[date_idx]));
 
+    
     data.forEach(function(d) {
-      console.log(d);
-      d.date = parseDate(d.date);
+      if (typeof(d.date) == 'string') {
+        d.date = parseDate(d.date); 
+      }
     });
 
     scores = color.domain().map(function(name) {
-      //console.log(name);
       return {
         name: name,
         values: data.map(function(d) {
-          //console.log(d[name]);
           var ret = {date: d.date, score: + d[name]};
-          //console.log(ret)
           return(ret)
         })
       };
@@ -407,7 +427,6 @@ function LeaderChart() {
         .style("text-anchor", "end")
         .attr("class", function(d,i) { return i==scores.length-1?"name":""; })
         .text(function(d,i) { 
-          //console.log(d);
           return teamranks[d]+"."; 
         });
     }
@@ -419,7 +438,6 @@ function LeaderChart() {
             .style("text-anchor", "end")
             .attr("class", function(d,i) { return i==scores.length-1?"name":""; })
             .text(function(d) { 
-              //console.log(d);
               return teamranks[d]+"."; 
             });
     }
@@ -446,15 +464,18 @@ function LeaderChart() {
             .attr("class", function(d,i) { return i==scores.length-1?"name":""; })
             .text(function(d) { return d; });
     
-    $("#battle").fadeIn();
+    //$("#battle svg").add("#gui").fadeIn();
+    $("#battle svg").fadeIn();
           
   };
   
-  this.toggle_view = function () {
-    show_ranks = !show_ranks;
+  this.toggle_view = function () { 
+    this.show_ranks = !this.show_ranks;
     this.update();
   };
 	
 }
 
 
+
+// d3.selectAll("path").classed("opaque",true)

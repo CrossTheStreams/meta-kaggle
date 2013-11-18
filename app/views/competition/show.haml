@@ -1,5 +1,22 @@
 #visualizations
   #battle
+    %br
+    .navbar.navbar-collapse{:role => 'navigation'}
+      .navbar-inner
+        .container
+          .title.navbar-toggle
+            %h4 #{@comp.title}
+          .nav-collapse.collapse
+            .title
+              %h3 #{@comp.title}
+              %a.glyphicon.glyphicon-link{:href => @comp.competition_url, :target => "_blank"}
+              %span #{@comp.blurb.to_s}
+            #gui
+  %br
+  %br
+  %br
+  %br
+  %br
 = hidden_field_tag "csv_url", @comp.csv_url
 :javascript
   error_based = #{@comp.error_based?}

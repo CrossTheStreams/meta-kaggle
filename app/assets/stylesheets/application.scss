@@ -44,16 +44,17 @@ body {
 }
 
 #battle {
-  display:none;
+  svg {
+    display:none; 
+  } 
 }
 svg {
   margin: auto;
   display: block;
 }
-
-
-.navbar-brand {
-
+  .char0 { 
+    color:#ffd500;
+  }
   .char1 { 
     color:#80b325;
   }
@@ -76,36 +77,35 @@ svg {
     color:#e53517;
   }
   .char8 { 
-    color:#eb6a0a;
+    // Space...
   }
   .char9 { 
-    color:#f49e00;
+    color:#eb6a0a;
   }
   .char10 { 
-    color:#ffd500;
+    color:#f49e00;
   }
   .char11 { 
-    color:#80b325;
+    color:#ffd500;
   }
   .char12 { 
-    color:#00914a;
+    color:#80b325;
   }
   .char13 { 
-    color:#019b9c;
+    color:#00914a;
   }
   .char14 { 
-    color:#0081df;
+    color:#019b9c;
   }
   .char15 { 
-    color:#7b3cd5;
+    color:#0081df;
   }
   .char16 { 
-    color:#e00b90;
+    color:#7b3cd5;
   }
   .char17 { 
-    color:#e53517;
+    color:#e00b90;
   }
-}
 
 .navbar-brand {
   left: 0px;
@@ -113,4 +113,81 @@ svg {
   min-width: 250px;
 }
 
+.dg.ac {
+  z-index: 10000;
+}
+
+.opaque {
+  /* IE 8 */
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+
+  /* IE 5-7 */
+  filter: alpha(opacity=50);
+
+  /* Netscape */
+  -moz-opacity: 0.5;
+
+  /* Safari 1.x */
+  -khtml-opacity: 0.5;
+
+  /* Good browsers */
+  opacity: 0.5;
+}
+
+#battle {
+  .navbar {
+    .navbar-toggle {
+      border: 0px; 
+      padding: 0px 12px 0px 22px;
+      top:0px;
+      width:100%;
+      height:50px;
+      text-align: center;
+    }
+    padding-right: 0px;
+    .title {
+      float:left; 
+      height:80px;
+      a {
+        font-size: 24px;
+        float: right;
+        margin-right: -40px;
+        margin-top: -40px;
+      }
+    }
+    #gui {
+      display:none;
+      float:right; 
+      .dg {
+        text-align: center;
+        font-size: 12px;
+        font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+        input {
+          text-align: center; 
+        } 
+      }
+      .dg .cr {
+        height: 40px;
+      }
+      .close-button {
+        display:none !important;
+      }
+    } 
+  }
+}
+.glyphicon:hover {
+ text-decoration: none !important;
+}
+#info-modal {
+  .modal-title {
+    text-align: center; 
+  }
+}
+#modal-quest {
+  color: white;
+  float:right;
+  font-size:18px;
+  cursor: pointer;
+  margin-top:11px;
+}
 

@@ -16,6 +16,7 @@
 
 // Thanks internet!
 // http://stackoverflow.com/questions/1960473/unique-values-in-an-array
+
 Array.prototype.getUnique = function(){
   var u = {}, a = [];
   for(var i = 0, l = this.length; i < l; ++i){
@@ -27,4 +28,14 @@ Array.prototype.getUnique = function(){
   }
   return a;
 }
+
+$(document).ready(function() {
+  $("#modal-quest").on('click',function() {
+    $("#info-modal").modal()
+  });
+  $("#close-info").on('click',function() {
+    $('#info-modal').modal('hide')
+  });
+  $(".modal-title span").lettering();
+});
 

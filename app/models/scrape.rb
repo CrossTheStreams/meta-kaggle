@@ -19,6 +19,8 @@ class Scrape < ActiveRecord::Base
 
     comp_strings = []
 
+    blurb_strings = []
+
     comp_links.map do |link| 
 
       href = link.attr('href')
@@ -34,12 +36,22 @@ class Scrape < ActiveRecord::Base
       competition = Competition.make!(str)
       #Scrape.async(:fetch_leaderboard,'fetch_lb',competition.id,scrape.id)
       
+      scrape.competitions << competition
+
       end_date = competition.end_date
       
       is_active = (Date.today < competition.end_date.to_date) rescue false
 
       if competition.end_date.blank? || is_active
         Scrape.fetch_leaderboard(competition.id,scrape.id)
+      end
+
+      # get a blurb for description
+
+      if competition.blurb.blank?
+        comp_doc = Nokogiri::HTML(open(competition.competition_url),nil,'ascii')
+        blurb = comp_doc.css('.page-name').first.text.strip rescue nil
+        competition.update_attribute(:blurb,blurb) if blurb
       end
 
     end 

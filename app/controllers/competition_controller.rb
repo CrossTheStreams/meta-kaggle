@@ -14,5 +14,10 @@ class CompetitionController < ApplicationController
     render :text => @comp.s3_csv and return
   end
 
+  def inactive
+    @comps = Competition.inactive  
+    render "main/index"
+  end
+
 end
 

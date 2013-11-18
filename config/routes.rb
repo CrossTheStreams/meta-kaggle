@@ -2,6 +2,8 @@ MetaKaggle::Application.routes.draw do
 
   root :to => "main#index"
 
+  match "/inactive" => "competition#inactive", :as => "competition_inactive"
+
   match "/csv/:name" => "competition#csv", :as => 'competition_csv'
 
   match "/c/:name" => "competition#show", :as => 'competition_show'

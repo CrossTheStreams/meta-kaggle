@@ -8,6 +8,10 @@ class Competition < ActiveRecord::Base
 
   has_many :leader_boards
   has_many :teams
+  
+  scope :active, lambda {where("end_date > (?)", Date.today) }
+  scope :inactive, lambda {where("end_date < (?)", Date.today) }
+
 
   def self.make!(name_string)
     comp = Competition.find_or_create_by_name(name_string) 
@@ -49,5 +53,8 @@ class Competition < ActiveRecord::Base
     "/csv/"+self.name+".csv"
   end
   
+  def competition_url
+    "http://www.kaggle.com/c/"+self.name
+  end
 
 end

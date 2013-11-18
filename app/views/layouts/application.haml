@@ -7,14 +7,16 @@
   = javascript_include_tag "application"
   = csrf_meta_tags
   %meta{:name => "viewport", :content => "width=device-width, initial-scale=1.0"}
+  %link{:href => "//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css", :rel => "stylesheet"}
   = yield :head
 %body
   #fb-root
-  .navbar.navbar-inverse.navbar-fixed-top
+  .navbar.navbar-inverse.navbar-fixed-top#navbar-parent
     .navbar-inner{:style => "height:40px;"}
       .container{:style => "height:40px;"}
         %a.navbar-brand{:href => root_path} 
           %span Rainbow Spaghetti
+        #modal-quest ?
         -#.nav-collapse.collapse
           -#%ul.nav.navbar-nav
             -#%li 
@@ -22,3 +24,27 @@
                 -#GitHub Repo
   .container{:style => "margin-top:50px;"}
     = yield 
+.modal.fade#info-modal{:tabindex => "-1", :role => "dialog", 'aria-labelledby'=>"myModalLabel", 'aria-hidden'=>"true"}
+  %canvas{:id => 'modal-canvas'}
+  .modal-dialog
+    .modal-content
+      .modal-header
+        %button.close{:type => "button", 'data-dismiss' => "modal", 'aria-hidden'=>"true"}
+        %h3.modal-title 
+          %span Rainbow Spaghetti
+      .modal-body
+        %p
+          %span As a web developer with an interest in machine learning, I think 
+          %a{:href => 'http://kaggle.com', :target => '_blank'} Kaggle
+          %span is awesome. Recently, I was wondering about how competition leaderboards might tell better stories through visualization. 
+        %p 
+          %span After a little digging, I found that Kaggle had already hosted 
+          %a{:href => 'http://www.kaggle.com/c/leapfrogging-leaderboards/visualization', :target => '_blank'} a competition for leaderboard visualizations
+          %span after all! As a pet project, I decided to use 
+          %a{:href => 'http://www.oliverstaubli.ch/home/', :target => '_blank'} Oliver Staubli's 
+          %span winning "Battles of the Best" visualization to make this web app you see right here. 
+        %p
+          %span Enjoy!
+      .modal-footer
+        %button#close-info.btn.btn-default{:type=>"button"}
+          Close

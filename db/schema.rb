@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131114065434) do
+ActiveRecord::Schema.define(:version => 20131118081436) do
 
   create_table "blood", :id => false, :force => true do |t|
     t.integer "morphno"
@@ -39,6 +39,7 @@ ActiveRecord::Schema.define(:version => 20131114065434) do
     t.string   "title"
     t.datetime "end_date"
     t.boolean  "error_based"
+    t.string   "blurb"
   end
 
   add_index "competitions", ["name"], :name => "index_competitions_on_name", :unique => true
