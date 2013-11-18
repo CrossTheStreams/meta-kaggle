@@ -37,5 +37,6 @@ $(document).ready(function() {
     $('#info-modal').modal('hide')
   });
   $(".modal-title span").lettering();
+  $("#some-guy-link").lettering();
 });
 

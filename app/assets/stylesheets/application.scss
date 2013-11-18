@@ -191,3 +191,20 @@ svg {
   margin-top:11px;
 }
 
+.footer {
+  position: fixed;
+  bottom: 0px;
+  height: 40px;
+  width: 100%;
+  background-color: #333;
+  text-align:center;
+  font-size: 12px;
+
+  #some-guy-link {
+    font-size: 1.1em;
+    display: inline-block;
+    margin-top: 10px;
+    margin-right: auto;
+    margin-left: auto; 
+  }
+}
