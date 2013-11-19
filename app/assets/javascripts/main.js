@@ -72,16 +72,18 @@ function LeaderChart() {
   
   this.ui_callbacks = function() {
 
-    // 1. High path on hover and make others opaque
-    //$('path').on('mouseover',function() { 
-      //$('path').not(this).addClass('opaque');
-    //});
+    d3.selectAll("path").on("mouseover",function(d, i){
+      other_paths = d3.selectAll("path").filter(function(dat, idx){
+                      return(dat["name"] != d["name"])
+                    });
+      other_paths.attr("class","line opaque");
+    })
 
-    //$('path').on('mouseout',function() {
-      //$('path').not(this).removeClass('opaque');
-    //});
-    //
-    // 2. Circles move on date hover; scores/rank in legen should reorder
+    d3.selectAll("path").on("mouseleave",function(d, i){
+      d3.selectAll("path").attr("class","line")
+    })
+
+    // Circles should move on date hover; scores/rank in legen should reorder
 
   },
   this.ensure_gui = function() {
@@ -275,8 +277,8 @@ function LeaderChart() {
 
   this.update = function() {
 
-    //var max_teams = this.max_teams,
-    var max_teams = this.data[0].length,
+    var max_teams = this.max_teams,
+    //var max_teams = this.data[0].length,
         line_height = this.line_height,
         show_ranks = this.show_ranks,
         minscoredeviation_scale = this.minscoredeviation_scale;
@@ -467,6 +469,7 @@ function LeaderChart() {
     
     //$("#battle svg").add("#gui").fadeIn();
     $("#battle svg").fadeIn();
+    this.ui_callbacks();
           
   };
   
